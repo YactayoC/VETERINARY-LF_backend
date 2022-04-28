@@ -104,4 +104,16 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { register, confirmToken, login };
+const revalidateToken = async (req, res) => {
+  const { uid, fullname } = req;
+  const token = await generateJWT(uid, fullname);
+
+  res.json({
+    ok: true,
+    uid,
+    fullname,
+    token,
+  });
+};
+
+module.exports = { register, confirmToken, login, revalidateToken };

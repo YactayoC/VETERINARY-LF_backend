@@ -21,7 +21,7 @@ router.post(
   [
     check('mascot', 'The name mascot is required').not().isEmpty(),
     check('symptom', 'The symptom is required').not().isEmpty(),
-    check('date', 'The symptom is required').custom(isDate),
+    check('date', 'The date is not valid').custom(isDate),
     fieldValidator,
   ],
   addAppointment,
