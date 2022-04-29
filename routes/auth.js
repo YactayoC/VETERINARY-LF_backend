@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const { check } = require('express-validator');
 const { fieldValidator } = require('../middleware/fieldValidator');
-const { register, confirmToken, login, revalidateToken } = require('../controllers/auth');
+const { register, confirmToken, login, revalidateToken, getProfile, updateProfile } = require('../controllers/auth');
 const { jwtValidate } = require('../middleware/jwtValidate');
 
 const router = Router();
@@ -31,6 +31,18 @@ router.post(
   login,
 );
 
-router.get('/revalidate', jwtValidate, revalidateToken);
+router.use(jwtValidate);
+router.get('/revalidate', revalidateToken);
+router.get('/profile', getProfile);
+router.put(
+  '/profile',
+  [
+    check('fullname', 'The name is required').not().isEmpty(),
+    check('phone', 'The phone is required').not().isEmpty().isNumeric(),
+    check('address', 'The address is required').not().isEmpty(),
+    fieldValidator,
+  ],
+  updateProfile,
+);
 
 module.exports = router;

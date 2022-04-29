@@ -116,4 +116,62 @@ const revalidateToken = async (req, res) => {
   });
 };
 
-module.exports = { register, confirmToken, login, revalidateToken };
+const getProfile = async (req, res) => {
+  const { uid } = req;
+
+  try {
+    const client = await Client.findById(uid);
+    if (!client) {
+      return res.status(400).json({
+        ok: false,
+        msg: 'User does not exist',
+      });
+    }
+
+    res.status(201).json({
+      ok: true,
+      uid: client.id,
+      fullname: client.fullname,
+      email: client.email,
+      phone: client.phone,
+      address: client.address,
+    });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      msg: 'Error in the server',
+    });
+  }
+};
+
+const updateProfile = async (req, res) => {
+  const { uid } = req;
+  const { fullname, phone, address } = req.body;
+
+  try {
+    const client = await Client.findById(uid);
+
+    if (!client) {
+      return res.status(400).json({
+        ok: false,
+        msg: 'User does not exist',
+      });
+    }
+
+    client.fullname = fullname;
+    client.phone = phone;
+    client.address = address;
+    await client.save();
+    res.json({
+      ok: true,
+      msg: 'User updated successfully',
+    });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      msg: 'Error in the server',
+    });
+  }
+};
+
+module.exports = { register, confirmToken, login, revalidateToken, getProfile, updateProfile };
