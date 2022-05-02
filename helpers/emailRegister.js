@@ -17,7 +17,7 @@ const emailRegister = async ({ email, fullname, token }) => {
     subject: 'Check your LF account',
     text: 'Check your LF account',
     html: `<p>Hello: ${fullname}, check your Loyal Friend account.</p>
-            <p>Your account is ready, you only have to check it in the following link: <a href="${process.env.FRONTEND_URL}/confirm/${token}">Check account</a> </p>
+            <p>Your account is ready, you only have to check it in the following link: <a href="${process.env.FRONTEND_URL}/confirm-account/${token}">Check account</a> </p>
             <p>If you didn't create this account, you can ignore this message</p>
         `,
   });

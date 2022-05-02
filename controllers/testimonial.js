@@ -11,19 +11,12 @@ const getTestimonial = async (req, res) => {
 
 const getTestimonialClient = async (req, res) => {
   const uid = req.uid;
+  const testimonial = await Testimonial.find({ client: uid });
 
-  try {
-    const testimonial = await Testimonial.find({ client: uid });
-    res.json({
-      ok: true,
-      testimonial,
-    });
-  } catch (error) {
-    res.status(500).json({
-      ok: false,
-      msg: 'Error in getTestimonialClient',
-    });
-  }
+  res.json({
+    ok: true,
+    testimonial,
+  });
 };
 
 const addTestimonial = async (req, res) => {

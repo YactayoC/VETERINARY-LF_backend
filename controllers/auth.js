@@ -130,11 +130,7 @@ const getProfile = async (req, res) => {
 
     res.status(201).json({
       ok: true,
-      uid: client.id,
-      fullname: client.fullname,
-      email: client.email,
-      phone: client.phone,
-      address: client.address,
+      client: client,
     });
   } catch (error) {
     res.status(500).json({
