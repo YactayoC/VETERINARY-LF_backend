@@ -6,6 +6,11 @@ const TestimonialSchema = Schema({
     required: true,
   },
 
+  date: {
+    type: Date,
+    require: true,
+  },
+
   client: {
     type: Schema.Types.ObjectId,
     ref: 'Client',

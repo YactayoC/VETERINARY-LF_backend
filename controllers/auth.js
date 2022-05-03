@@ -106,12 +106,14 @@ const login = async (req, res) => {
 
 const revalidateToken = async (req, res) => {
   const { uid, fullname } = req;
-  const token = await generateJWT(uid, fullname);
+  const client = await Client.findById(uid);
+
+  const token = await generateJWT(uid, client.fullname);
 
   res.json({
     ok: true,
     uid,
-    fullname,
+    fullname: client.fullname,
     token,
   });
 };
