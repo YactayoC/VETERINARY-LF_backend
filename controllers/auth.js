@@ -89,6 +89,13 @@ const login = async (req, res) => {
       });
     }
 
+    if (!client.confirmed) {
+      return res.status(400).json({
+        ok: false,
+        msg: 'User not confirmed',
+      });
+    }
+
     const token = generateJWT(client.id, client.fullname);
     res.status(201).json({
       ok: true,
