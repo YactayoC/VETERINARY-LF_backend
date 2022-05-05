@@ -5,12 +5,16 @@ const { jwtValidate } = require('../middleware/jwtValidate');
 const {
   getTestimonial,
   getTestimonialClient,
+  getTestimonialAll,
   addTestimonial,
   updateTestimonial,
   deleteTestimonial,
 } = require('../controllers/testimonial');
 
 const router = Router();
+
+router.get('/getTestimonialsAll', getTestimonialAll);
+
 router.use(jwtValidate);
 
 router.get('/getTestimonials', getTestimonial);

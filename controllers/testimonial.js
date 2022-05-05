@@ -19,6 +19,15 @@ const getTestimonialClient = async (req, res) => {
   });
 };
 
+const getTestimonialAll = async (req, res) => {
+  const testimonials = await Testimonial.find().populate('client', 'fullname').limit(4).sort({ $natural: -1 });
+
+  res.json({
+    ok: true,
+    testimonials,
+  });
+};
+
 const addTestimonial = async (req, res) => {
   const testimonial = new Testimonial(req.body);
 
@@ -94,4 +103,11 @@ const deleteTestimonial = async (req, res) => {
   }
 };
 
-module.exports = { getTestimonial, getTestimonialClient, addTestimonial, updateTestimonial, deleteTestimonial };
+module.exports = {
+  getTestimonial,
+  getTestimonialClient,
+  getTestimonialAll,
+  addTestimonial,
+  updateTestimonial,
+  deleteTestimonial,
+};
