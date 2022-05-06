@@ -1,7 +1,7 @@
 const Appointment = require('../models/Appointment');
 
 const getAppointments = async (req, res) => {
-  const appointments = await Appointment.find().populate('client', 'fullname');
+  const appointments = await Appointment.find().populate('client', 'fullname').sort({ $natural: -1 });
 
   res.json({
     ok: true,
@@ -70,6 +70,38 @@ const updateAppointment = async (req, res) => {
   }
 };
 
+updateAppointmentState = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const appointment = await Appointment.findById(id);
+
+    if (!appointment) {
+      return res.status(404).json({
+        ok: false,
+        msg: 'Appointment not found',
+      });
+    }
+
+    const newAppointment = {
+      ...req.body,
+    };
+
+    const appointmentUpdated = await Appointment.findByIdAndUpdate(id, newAppointment, { new: true });
+
+    res.json({
+      ok: true,
+      appointment: appointmentUpdated,
+      msg: 'Appointment updated successfully',
+    });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      msg: 'Error in updateAppointment',
+    });
+  }
+};
+
 const deleteAppointment = async (req, res) => {
   const { id } = req.params;
   const uid = req.uid;
@@ -96,4 +128,11 @@ const deleteAppointment = async (req, res) => {
   }
 };
 
-module.exports = { getAppointments, getAppointmentClient, addAppointment, updateAppointment, deleteAppointment };
+module.exports = {
+  getAppointments,
+  getAppointmentClient,
+  addAppointment,
+  updateAppointment,
+  updateAppointmentState,
+  deleteAppointment,
+};

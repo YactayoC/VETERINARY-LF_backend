@@ -9,6 +9,7 @@ const {
   addAppointment,
   updateAppointment,
   deleteAppointment,
+  updateAppointmentState,
 } = require('../controllers/appointment');
 
 const router = Router();
@@ -36,6 +37,7 @@ router.put(
   ],
   updateAppointment,
 );
+router.put('/updateAppointmentState/:id', updateAppointmentState);
 router.delete('/deleteAppointment/:id', deleteAppointment);
 
 module.exports = router;
