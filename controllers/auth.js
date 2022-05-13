@@ -30,7 +30,7 @@ const register = async (req, res) => {
       ok: true,
       uid: client.id,
       fullname: client.fullname,
-      msg: 'User created successfully',
+      msg: 'User successfully created, please verify your email address',
     });
   } catch (error) {
     res.status(500).json({

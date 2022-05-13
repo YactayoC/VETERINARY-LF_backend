@@ -104,7 +104,6 @@ updateAppointmentState = async (req, res) => {
 
 const deleteAppointment = async (req, res) => {
   const { id } = req.params;
-  const uid = req.uid;
 
   try {
     const appointment = await Appointment.findById(id);
