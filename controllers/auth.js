@@ -101,6 +101,7 @@ const login = async (req, res) => {
       ok: true,
       uid: client.id,
       fullname: client.fullname,
+      type: client.type,
       token,
     });
   } catch (error) {
@@ -121,6 +122,7 @@ const revalidateToken = async (req, res) => {
     ok: true,
     uid,
     fullname: client.fullname,
+    type: client.type,
     token,
   });
 };
