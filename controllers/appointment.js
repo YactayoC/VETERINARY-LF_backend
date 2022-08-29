@@ -3,7 +3,7 @@ const Appointment = require('../models/Appointment');
 const getAppointments = async (req, res) => {
   const appointments = await Appointment.find().populate('client', 'fullname').sort({ $natural: -1 });
 
-  res.json({
+  res.status(200).json({
     ok: true,
     appointments,
   });
@@ -13,7 +13,7 @@ const getAppointmentClient = async (req, res) => {
   const uid = req.uid;
   const appointments = await Appointment.find({ client: uid });
 
-  res.json({
+  res.status(200).json({
     ok: true,
     appointments,
   });
@@ -25,13 +25,13 @@ const addAppointment = async (req, res) => {
   try {
     appointment.client = req.uid;
     const appointmentSave = await appointment.save();
-    res.json({
+    res.status(201).json({
       ok: true,
       appointment: appointmentSave,
       msg: 'Appointment saved successfully',
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(400).json({
       ok: false,
       msg: 'Error in addAppointment',
     });
@@ -57,20 +57,20 @@ const updateAppointment = async (req, res) => {
     };
 
     const appointmentUpdated = await Appointment.findByIdAndUpdate(id, newAppointment, { new: true });
-    res.json({
+    res.status(202).json({
       ok: true,
       appointment: appointmentUpdated,
       msg: 'Appointment updated successfully',
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(400).json({
       ok: false,
       msg: 'Error in updateAppointment',
     });
   }
 };
 
-updateAppointmentState = async (req, res) => {
+const updateAppointmentState = async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -89,13 +89,13 @@ updateAppointmentState = async (req, res) => {
 
     const appointmentUpdated = await Appointment.findByIdAndUpdate(id, newAppointment, { new: true });
 
-    res.json({
+    res.status(202).json({
       ok: true,
       appointment: appointmentUpdated,
       msg: 'Appointment updated successfully',
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(400).json({
       ok: false,
       msg: 'Error in updateAppointment',
     });
@@ -115,12 +115,12 @@ const deleteAppointment = async (req, res) => {
     }
 
     await Appointment.findByIdAndDelete(id);
-    res.json({
+    res.status(202).json({
       ok: true,
       msg: 'Appointment deleted successfully',
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(400).json({
       ok: false,
       msg: 'Error in deleteAppointment',
     });

@@ -3,7 +3,7 @@ const Testimonial = require('../models/Testimonial');
 const getTestimonial = async (req, res) => {
   const testimonials = await Testimonial.find().populate('client', 'fullname');
 
-  res.json({
+  res.status(200).json({
     ok: true,
     testimonials,
   });
@@ -13,7 +13,7 @@ const getTestimonialClient = async (req, res) => {
   const uid = req.uid;
   const testimonial = await Testimonial.find({ client: uid });
 
-  res.json({
+  res.status(200).json({
     ok: true,
     testimonial,
   });
@@ -22,7 +22,7 @@ const getTestimonialClient = async (req, res) => {
 const getTestimonialAll = async (req, res) => {
   const testimonials = await Testimonial.find().populate('client', 'fullname').limit(4).sort({ $natural: -1 });
 
-  res.json({
+  res.status(200).json({
     ok: true,
     testimonials,
   });
@@ -34,7 +34,7 @@ const addTestimonial = async (req, res) => {
   try {
     testimonial.client = req.uid;
     const testimonialSave = await testimonial.save();
-    res.json({
+    res.status(201).json({
       ok: true,
       testimonial: testimonialSave,
       msg: 'Testimonial saved successfully',
@@ -66,13 +66,13 @@ const updateTestimonial = async (req, res) => {
     };
 
     const testimonialUpdated = await Testimonial.findByIdAndUpdate(id, newTestimonial, { new: true });
-    res.json({
+    res.status(202).json({
       ok: true,
       testimonial: testimonialUpdated,
       msg: 'Testimonial updated successfully',
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(400).json({
       ok: false,
       msg: 'Error in updateTestimonial',
     });
@@ -91,12 +91,12 @@ const deleteTestimonial = async (req, res) => {
     }
 
     await Testimonial.findByIdAndDelete(id);
-    res.json({
+    res.status(202).json({
       ok: true,
       msg: 'Testimonial deleted successfully',
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(400).json({
       ok: false,
       msg: 'Error in deleteTestimonial',
     });

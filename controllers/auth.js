@@ -26,6 +26,7 @@ const register = async (req, res) => {
       fullname: clientSaved.fullname,
       token: clientSaved.token,
     });
+
     res.status(201).json({
       ok: true,
       uid: client.id,
@@ -33,7 +34,7 @@ const register = async (req, res) => {
       msg: 'User successfully created, please verify your email address',
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(400).json({
       ok: false,
       msg: 'Error in the server',
     });
@@ -56,12 +57,12 @@ const confirmToken = async (req, res) => {
     client.confirmed = true;
     client.token = null;
     await client.save();
-    res.status(201).json({
+    res.status(202).json({
       ok: true,
       msg: 'User confirmed successfully',
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(400).json({
       ok: false,
       msg: 'Error in the server',
     });
@@ -97,7 +98,7 @@ const login = async (req, res) => {
     }
 
     const token = generateJWT(client.id, client.fullname);
-    res.status(201).json({
+    res.status(200).json({
       ok: true,
       uid: client.id,
       fullname: client.fullname,
@@ -105,7 +106,7 @@ const login = async (req, res) => {
       token,
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(400).json({
       ok: false,
       msg: 'Error in the server',
     });
@@ -116,9 +117,9 @@ const revalidateToken = async (req, res) => {
   const { uid } = req;
   const client = await Client.findById(uid);
 
-  const token = await generateJWT(uid, client.fullname);
+  const token = generateJWT(uid, client.fullname);
 
-  res.json({
+  res.status(200).json({
     ok: true,
     uid,
     fullname: client.fullname,
@@ -139,12 +140,12 @@ const getProfile = async (req, res) => {
       });
     }
 
-    res.status(201).json({
+    res.status(200).json({
       ok: true,
-      client: client,
+      client,
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(400).json({
       ok: false,
       msg: 'Error in the server',
     });
@@ -169,12 +170,12 @@ const updateProfile = async (req, res) => {
     client.phone = phone;
     client.address = address;
     await client.save();
-    res.json({
+    res.status(202).json({
       ok: true,
       msg: 'User updated successfully',
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(400).json({
       ok: false,
       msg: 'Error in the server',
     });
