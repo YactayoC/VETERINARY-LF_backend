@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+
 const Client = require('../models/Client');
 const { generateJWT } = require('../helpers/jwt');
 const { emailRegister } = require('../helpers/emailRegister');

@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+
 const Employee = require('../models/Employee');
 const { generateJWT } = require('../helpers/jwt');
 
