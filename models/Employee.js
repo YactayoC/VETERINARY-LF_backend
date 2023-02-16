@@ -32,7 +32,7 @@ const EmployeeSchema = Schema({
     default: true,
   },
 
-  type: {
+  role: {
     type: String,
     default: 'employee',
   },

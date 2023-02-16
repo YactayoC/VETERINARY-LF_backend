@@ -4,10 +4,9 @@ const Employee = require('../models/Employee');
 const { generateJWT } = require('../helpers/jwt');
 
 const getEmployees = async (req, res) => {
-  const employees = await Employee.find();
+  const employees = await Employee.find().select('-__v');
 
   res.status(200).json({
-    ok: true,
     employees,
   });
 };
@@ -19,13 +18,11 @@ const addEmployee = async (req, res) => {
     employee.password = await bcrypt.hash(employee.password, 10);
     const employeeSave = await employee.save();
     res.status(201).json({
-      ok: true,
       employee: employeeSave,
       msg: 'Employee saved successfully',
     });
   } catch (error) {
     res.status(400).json({
-      ok: false,
       msg: 'Error in addEmployee',
     });
   }
@@ -38,7 +35,6 @@ const updateEmployee = async (req, res) => {
     const employee = await Employee.findById(id);
     if (!employee) {
       return res.status(400).json({
-        ok: false,
         msg: 'Employee not found',
       });
     }
@@ -49,13 +45,11 @@ const updateEmployee = async (req, res) => {
 
     const employeeUpdated = await Employee.findByIdAndUpdate(id, newEmployee, { new: true });
     res.status(202).json({
-      ok: true,
       employee: employeeUpdated,
       msg: 'Employee updated successfully',
     });
   } catch (error) {
     res.status(400).json({
-      ok: false,
       msg: 'Error in updateEmployee',
     });
   }
@@ -68,19 +62,16 @@ const deleteEmployee = async (req, res) => {
     const employee = await Employee.findById(id);
     if (!employee) {
       return res.status(404).json({
-        ok: false,
         msg: 'Employee not found',
       });
     }
 
     await Employee.findByIdAndDelete(id);
     res.status(202).json({
-      ok: true,
       msg: 'Employee deleted successfully',
     });
   } catch (error) {
     res.status(400).json({
-      ok: false,
       msg: 'Error in deleteEmployee',
     });
   }
@@ -90,11 +81,10 @@ const loginEmployee = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const employee = await Employee.findOne({ email });
+    const employee = await Employee.findOne({ email }).select('-__v');
 
     if (!employee) {
       return res.status(400).json({
-        ok: false,
         msg: 'User does not exist',
       });
     }
@@ -102,22 +92,17 @@ const loginEmployee = async (req, res) => {
     const validPassword = bcrypt.compareSync(password, employee.password);
     if (!validPassword) {
       return res.status(400).json({
-        ok: false,
         msg: 'Invalid password',
       });
     }
 
     const token = generateJWT(employee.id, employee.fullname);
     res.status(200).json({
-      ok: true,
-      uid: employee.id,
-      fullname: employee.fullname,
-      type: employee.type,
+      employee,
       token,
     });
   } catch (error) {
     res.status(400).json({
-      ok: false,
       msg: 'Error in the server',
     });
   }
@@ -130,10 +115,9 @@ const revalidateTokenEmployee = async (req, res) => {
   const token = await generateJWT(uid, employee.fullname);
 
   res.status(200).json({
-    ok: true,
     uid,
     fullname: employee.fullname,
-    type: employee.type,
+    role: employee.role,
     token,
   });
 };
@@ -145,18 +129,15 @@ const employeeGetProfile = async (req, res) => {
     const employee = await Employee.findById(uid);
     if (!employee) {
       return res.status(404).json({
-        ok: false,
         msg: 'User does not exist',
       });
     }
 
     res.status(200).json({
-      ok: true,
       employee,
     });
   } catch (error) {
     res.status(400).json({
-      ok: false,
       msg: 'Error in the server',
     });
   }

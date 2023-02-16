@@ -8,11 +8,11 @@ const register = async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    /* Mongo ignore --v */
     let client = await Client.findOne({ email });
 
     if (client) {
       return res.status(400).json({
-        ok: false,
         msg: 'User already exists',
       });
     }
@@ -29,14 +29,10 @@ const register = async (req, res) => {
     });
 
     res.status(201).json({
-      ok: true,
-      uid: client.id,
-      fullname: client.fullname,
       msg: 'User successfully created, please verify your email address',
     });
   } catch (error) {
     res.status(400).json({
-      ok: false,
       msg: 'Error in the server',
     });
   }
@@ -50,7 +46,6 @@ const confirmToken = async (req, res) => {
 
     if (!client) {
       return res.status(400).json({
-        ok: false,
         msg: 'Invalid token',
       });
     }
@@ -59,12 +54,10 @@ const confirmToken = async (req, res) => {
     client.token = null;
     await client.save();
     res.status(202).json({
-      ok: true,
       msg: 'User confirmed successfully',
     });
   } catch (error) {
     res.status(400).json({
-      ok: false,
       msg: 'Error in the server',
     });
   }
@@ -74,11 +67,10 @@ const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const client = await Client.findOne({ email });
+    const client = await Client.findOne({ email }).select('-__v');
 
     if (!client) {
       return res.status(400).json({
-        ok: false,
         msg: 'User does not exist',
       });
     }
@@ -86,29 +78,23 @@ const login = async (req, res) => {
     const validPassword = bcrypt.compareSync(password, client.password);
     if (!validPassword) {
       return res.status(400).json({
-        ok: false,
         msg: 'Invalid password',
       });
     }
 
     if (!client.confirmed) {
       return res.status(400).json({
-        ok: false,
         msg: 'User not confirmed',
       });
     }
 
     const token = generateJWT(client.id, client.fullname);
     res.status(200).json({
-      ok: true,
-      uid: client.id,
-      fullname: client.fullname,
-      type: client.type,
+      client,
       token,
     });
   } catch (error) {
     res.status(400).json({
-      ok: false,
       msg: 'Error in the server',
     });
   }
@@ -116,15 +102,12 @@ const login = async (req, res) => {
 
 const revalidateToken = async (req, res) => {
   const { uid } = req;
-  const client = await Client.findById(uid);
+  const client = await Client.findById(uid).select('-__v');
 
   const token = generateJWT(uid, client.fullname);
 
   res.status(200).json({
-    ok: true,
-    uid,
-    fullname: client.fullname,
-    type: client.type,
+    client,
     token,
   });
 };
@@ -136,18 +119,15 @@ const getProfile = async (req, res) => {
     const client = await Client.findById(uid);
     if (!client) {
       return res.status(400).json({
-        ok: false,
         msg: 'User does not exist',
       });
     }
 
     res.status(200).json({
-      ok: true,
       client,
     });
   } catch (error) {
     res.status(400).json({
-      ok: false,
       msg: 'Error in the server',
     });
   }
@@ -158,11 +138,10 @@ const updateProfile = async (req, res) => {
   const { fullname, phone, address } = req.body;
 
   try {
-    const client = await Client.findById(uid);
+    const client = await Client.findById(uid).select('-__v');
 
     if (!client) {
       return res.status(400).json({
-        ok: false,
         msg: 'User does not exist',
       });
     }
@@ -170,14 +149,15 @@ const updateProfile = async (req, res) => {
     client.fullname = fullname;
     client.phone = phone;
     client.address = address;
-    await client.save();
+    const token = generateJWT(client.id, client.fullname);
+    const clientSaved = await client.save();
     res.status(202).json({
-      ok: true,
+      client: clientSaved,
+      token,
       msg: 'User updated successfully',
     });
   } catch (error) {
     res.status(400).json({
-      ok: false,
       msg: 'Error in the server',
     });
   }

@@ -1,20 +1,18 @@
 const Appointment = require('../models/Appointment');
 
 const getAppointments = async (req, res) => {
-  const appointments = await Appointment.find().populate('client', 'fullname').sort({ $natural: -1 });
+  const appointments = await Appointment.find().populate('client', 'fullname').sort({ $natural: -1 }).select('-__v');
 
   res.status(200).json({
-    ok: true,
     appointments,
   });
 };
 
 const getAppointmentClient = async (req, res) => {
   const uid = req.uid;
-  const appointments = await Appointment.find({ client: uid });
+  const appointments = await Appointment.find({ client: uid }).select('-__v');
 
   res.status(200).json({
-    ok: true,
     appointments,
   });
 };
@@ -26,13 +24,11 @@ const addAppointment = async (req, res) => {
     appointment.client = req.uid;
     const appointmentSave = await appointment.save();
     res.status(201).json({
-      ok: true,
       appointment: appointmentSave,
       msg: 'Appointment saved successfully',
     });
   } catch (error) {
     res.status(400).json({
-      ok: false,
       msg: 'Error in addAppointment',
     });
   }
@@ -43,10 +39,9 @@ const updateAppointment = async (req, res) => {
   const uid = req.uid;
 
   try {
-    const appointment = await Appointment.findById(id);
+    const appointment = await Appointment.findById(id).select('-__v');
     if (!appointment) {
       return res.status(404).json({
-        ok: false,
         msg: 'Appointment not found',
       });
     }
@@ -58,13 +53,11 @@ const updateAppointment = async (req, res) => {
 
     const appointmentUpdated = await Appointment.findByIdAndUpdate(id, newAppointment, { new: true });
     res.status(202).json({
-      ok: true,
       appointment: appointmentUpdated,
       msg: 'Appointment updated successfully',
     });
   } catch (error) {
     res.status(400).json({
-      ok: false,
       msg: 'Error in updateAppointment',
     });
   }
@@ -78,7 +71,6 @@ const updateAppointmentState = async (req, res) => {
 
     if (!appointment) {
       return res.status(404).json({
-        ok: false,
         msg: 'Appointment not found',
       });
     }
@@ -87,16 +79,16 @@ const updateAppointmentState = async (req, res) => {
       ...req.body,
     };
 
-    const appointmentUpdated = await Appointment.findByIdAndUpdate(id, newAppointment, { new: true });
+    const appointmentUpdated = await Appointment.findByIdAndUpdate(id, newAppointment, { new: true })
+      .populate('client', 'fullname')
+      .select('-__v');
 
     res.status(202).json({
-      ok: true,
       appointment: appointmentUpdated,
       msg: 'Appointment updated successfully',
     });
   } catch (error) {
     res.status(400).json({
-      ok: false,
       msg: 'Error in updateAppointment',
     });
   }
@@ -109,19 +101,16 @@ const deleteAppointment = async (req, res) => {
     const appointment = await Appointment.findById(id);
     if (!appointment) {
       return res.status(404).json({
-        ok: false,
         msg: 'Appointment not found',
       });
     }
 
     await Appointment.findByIdAndDelete(id);
     res.status(202).json({
-      ok: true,
       msg: 'Appointment deleted successfully',
     });
   } catch (error) {
     res.status(400).json({
-      ok: false,
       msg: 'Error in deleteAppointment',
     });
   }

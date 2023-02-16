@@ -8,7 +8,7 @@ const ClientSchema = Schema({
   },
 
   phone: {
-    type: Number,
+    type: String,
     required: true,
   },
 
@@ -28,7 +28,7 @@ const ClientSchema = Schema({
     required: true,
   },
 
-  token: {
+  key: {
     type: String,
     default: generateToken(),
   },
@@ -38,7 +38,7 @@ const ClientSchema = Schema({
     default: false,
   },
 
-  type: {
+  role: {
     type: String,
     default: 'client',
   },
