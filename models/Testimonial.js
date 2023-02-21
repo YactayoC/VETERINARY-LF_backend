@@ -11,9 +11,9 @@ const TestimonialSchema = Schema({
     require: true,
   },
 
-  client: {
+  user: {
     type: Schema.Types.ObjectId,
-    ref: 'Client',
+    ref: 'User',
     required: true,
   },
 });

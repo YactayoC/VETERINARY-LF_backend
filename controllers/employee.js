@@ -1,18 +1,19 @@
 const bcrypt = require('bcryptjs');
 
 const Employee = require('../models/Employee');
+const User = require('../models/User');
 const { generateJWT } = require('../helpers/jwt');
 
 const getEmployees = async (req, res) => {
-  const employees = await Employee.find().select('-__v');
+  const users = await User.find({ role: 'employee' }).select('-__v');
 
   res.status(200).json({
-    employees,
+    users,
   });
 };
 
 const addEmployee = async (req, res) => {
-  const employee = new Employee(req.body);
+  const employee = new User(req.body);
 
   try {
     employee.password = await bcrypt.hash(employee.password, 10);
@@ -32,7 +33,7 @@ const updateEmployee = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const employee = await Employee.findById(id);
+    const employee = await User.findById(id);
     if (!employee) {
       return res.status(400).json({
         msg: 'Employee not found',
@@ -43,7 +44,7 @@ const updateEmployee = async (req, res) => {
       ...req.body,
     };
 
-    const employeeUpdated = await Employee.findByIdAndUpdate(id, newEmployee, { new: true });
+    const employeeUpdated = await User.findByIdAndUpdate(id, newEmployee, { new: true });
     res.status(202).json({
       employee: employeeUpdated,
       msg: 'Employee updated successfully',
@@ -59,14 +60,14 @@ const deleteEmployee = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const employee = await Employee.findById(id);
+    const employee = await User.findById(id);
     if (!employee) {
       return res.status(404).json({
         msg: 'Employee not found',
       });
     }
 
-    await Employee.findByIdAndDelete(id);
+    await User.findByIdAndDelete(id);
     res.status(202).json({
       msg: 'Employee deleted successfully',
     });

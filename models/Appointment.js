@@ -21,9 +21,9 @@ const AppointmentSchema = new Schema({
     default: 'Pending',
   },
 
-  client: {
+  user: {
     type: Schema.Types.ObjectId,
-    ref: 'Client',
+    ref: 'User',
     required: true,
   },
 });

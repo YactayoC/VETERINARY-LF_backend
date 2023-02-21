@@ -1,7 +1,7 @@
 const Testimonial = require('../models/Testimonial');
 
 const getTestimonial = async (req, res) => {
-  const testimonials = await Testimonial.find().populate('client', 'fullname');
+  const testimonials = await Testimonial.find().populate('user', 'fullname');
 
   res.status(200).json({
     testimonials,
@@ -10,7 +10,7 @@ const getTestimonial = async (req, res) => {
 
 const getTestimonialClient = async (req, res) => {
   const uid = req.uid;
-  const testimonial = await Testimonial.find({ client: uid });
+  const testimonial = await Testimonial.find({ user: uid });
 
   res.status(200).json({
     testimonial,
@@ -18,7 +18,7 @@ const getTestimonialClient = async (req, res) => {
 };
 
 const getTestimonialAll = async (req, res) => {
-  const testimonials = await Testimonial.find().populate('client', 'fullname').limit(4).sort({ $natural: -1 });
+  const testimonials = await Testimonial.find().populate('user', 'fullname').limit(4).sort({ $natural: -1 });
 
   res.status(200).json({
     testimonials,
@@ -29,7 +29,7 @@ const addTestimonial = async (req, res) => {
   const testimonial = new Testimonial(req.body);
 
   try {
-    testimonial.client = req.uid;
+    testimonial.user = req.uid;
     const testimonialSave = await testimonial.save();
     res.status(201).json({
       testimonial: testimonialSave,
@@ -56,7 +56,7 @@ const updateTestimonial = async (req, res) => {
 
     const newTestimonial = {
       ...req.body,
-      client: uid,
+      user: uid,
     };
 
     const testimonialUpdated = await Testimonial.findByIdAndUpdate(id, newTestimonial, { new: true });

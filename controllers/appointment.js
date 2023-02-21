@@ -1,7 +1,7 @@
 const Appointment = require('../models/Appointment');
 
 const getAppointments = async (req, res) => {
-  const appointments = await Appointment.find().populate('client', 'fullname').sort({ $natural: -1 }).select('-__v');
+  const appointments = await Appointment.find().populate('user', 'fullname').sort({ $natural: -1 }).select('-__v');
 
   res.status(200).json({
     appointments,
@@ -10,7 +10,7 @@ const getAppointments = async (req, res) => {
 
 const getAppointmentClient = async (req, res) => {
   const uid = req.uid;
-  const appointments = await Appointment.find({ client: uid }).select('-__v');
+  const appointments = await Appointment.find({ user: uid }).select('-__v');
 
   res.status(200).json({
     appointments,
@@ -18,10 +18,12 @@ const getAppointmentClient = async (req, res) => {
 };
 
 const addAppointment = async (req, res) => {
+  console.log('llego al addAppointment');
   const appointment = new Appointment(req.body);
+  console.log('despues de los datos');
 
   try {
-    appointment.client = req.uid;
+    appointment.user = req.uid;
     const appointmentSave = await appointment.save();
     res.status(201).json({
       appointment: appointmentSave,
@@ -48,7 +50,7 @@ const updateAppointment = async (req, res) => {
 
     const newAppointment = {
       ...req.body,
-      client: uid,
+      user: uid,
     };
 
     const appointmentUpdated = await Appointment.findByIdAndUpdate(id, newAppointment, { new: true });
@@ -80,7 +82,7 @@ const updateAppointmentState = async (req, res) => {
     };
 
     const appointmentUpdated = await Appointment.findByIdAndUpdate(id, newAppointment, { new: true })
-      .populate('client', 'fullname')
+      .populate('user', 'fullname')
       .select('-__v');
 
     res.status(202).json({

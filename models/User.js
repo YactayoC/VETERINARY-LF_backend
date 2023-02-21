@@ -1,7 +1,7 @@
 const { Schema, model } = require('mongoose');
 const { generateToken } = require('../helpers/generateToken');
 
-const ClientSchema = Schema({
+const UserSchema = Schema({
   fullname: {
     type: String,
     required: true,
@@ -44,4 +44,4 @@ const ClientSchema = Schema({
   },
 });
 
-module.exports = model('Client', ClientSchema);
+module.exports = model('User', UserSchema);

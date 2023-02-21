@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 
-const Client = require('../models/Client');
+const User = require('../models/User');
 const { generateJWT } = require('../helpers/jwt');
 const { emailRegister } = require('../helpers/emailRegister');
 
@@ -8,24 +8,23 @@ const register = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    /* Mongo ignore --v */
-    let client = await Client.findOne({ email });
+    let user = await User.findOne({ email });
 
-    if (client) {
+    if (user) {
       return res.status(400).json({
         msg: 'User already exists',
       });
     }
 
-    client = new Client(req.body);
+    user = new User(req.body);
     const salt = bcrypt.genSaltSync();
-    client.password = bcrypt.hashSync(password, salt);
-    const clientSaved = await client.save();
+    user.password = bcrypt.hashSync(password, salt);
+    const userSaved = await user.save();
 
     emailRegister({
-      email: clientSaved.email,
-      fullname: clientSaved.fullname,
-      token: clientSaved.token,
+      email: userSaved.email,
+      fullname: userSaved.fullname,
+      token: userSaved.token,
     });
 
     res.status(201).json({
@@ -42,22 +41,25 @@ const confirmToken = async (req, res) => {
   const { token } = req.params;
 
   try {
-    const client = await Client.findOne({ token });
+    const user = await User.findOne({ key: token });
 
-    if (!client) {
+    if (!user) {
       return res.status(400).json({
+        confirm: false,
         msg: 'Invalid token',
       });
     }
 
-    client.confirmed = true;
-    client.token = null;
-    await client.save();
+    user.confirmed = true;
+    user.key = null;
+    await user.save();
     res.status(202).json({
+      confirm: true,
       msg: 'User confirmed successfully',
     });
   } catch (error) {
     res.status(400).json({
+      confirm: false,
       msg: 'Error in the server',
     });
   }
@@ -67,30 +69,30 @@ const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const client = await Client.findOne({ email }).select('-__v');
+    const user = await User.findOne({ email }).select('-__v');
 
-    if (!client) {
+    if (!user) {
       return res.status(400).json({
         msg: 'User does not exist',
       });
     }
 
-    const validPassword = bcrypt.compareSync(password, client.password);
+    const validPassword = bcrypt.compareSync(password, user.password);
     if (!validPassword) {
       return res.status(400).json({
         msg: 'Invalid password',
       });
     }
 
-    if (!client.confirmed) {
+    if (!user.confirmed) {
       return res.status(400).json({
         msg: 'User not confirmed',
       });
     }
 
-    const token = generateJWT(client.id, client.fullname);
+    const token = generateJWT(user.id, user.fullname);
     res.status(200).json({
-      client,
+      user,
       token,
     });
   } catch (error) {
@@ -102,12 +104,12 @@ const login = async (req, res) => {
 
 const revalidateToken = async (req, res) => {
   const { uid } = req;
-  const client = await Client.findById(uid).select('-__v');
+  const user = await User.findById(uid).select('-__v');
 
-  const token = generateJWT(uid, client.fullname);
+  const token = generateJWT(uid, user.fullname);
 
   res.status(200).json({
-    client,
+    user,
     token,
   });
 };
@@ -116,15 +118,15 @@ const getProfile = async (req, res) => {
   const { uid } = req;
 
   try {
-    const client = await Client.findById(uid);
-    if (!client) {
+    const user = await User.findById(uid);
+    if (!user) {
       return res.status(400).json({
         msg: 'User does not exist',
       });
     }
 
     res.status(200).json({
-      client,
+      user,
     });
   } catch (error) {
     res.status(400).json({
@@ -138,21 +140,21 @@ const updateProfile = async (req, res) => {
   const { fullname, phone, address } = req.body;
 
   try {
-    const client = await Client.findById(uid).select('-__v');
+    const user = await User.findById(uid).select('-__v');
 
-    if (!client) {
+    if (!user) {
       return res.status(400).json({
         msg: 'User does not exist',
       });
     }
 
-    client.fullname = fullname;
-    client.phone = phone;
-    client.address = address;
-    const token = generateJWT(client.id, client.fullname);
-    const clientSaved = await client.save();
+    user.fullname = fullname;
+    user.phone = phone;
+    user.address = address;
+    const token = generateJWT(user.id, user.fullname);
+    const userSaved = await user.save();
     res.status(202).json({
-      client: clientSaved,
+      user: userSaved,
       token,
       msg: 'User updated successfully',
     });
